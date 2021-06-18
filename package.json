@@ -11,7 +11,7 @@
     "full-install": "npm install && npm run react-typings && npm run jest-typings && npm run enzyme-typings",
     "build": "webpack",
     "lint": "tslint  --format verbose 'src/**/*.ts?(x)'",
-    "test": "jest --updateSnapshot",
+    "test": "jest --updateSnapshot --config jest.config.cjs",
     "start": "webpack-dev-server --config webpack.config.cjs --port=3003  --hot"
   },
   "dependencies": {
@@ -23,6 +23,7 @@
     "@testing-library/react": "^11.2.7",
     "@types/react": "^17.0.11",
     "@types/react-dom": "^17.0.8",
+    "@types/react-test-renderer": "^17.0.1",
     "babel-loader": "^8.2.2",
     "graphql": "^15.5.0",
     "mobx": "^6.3.2",

@@ -1,29 +1,64 @@
+/**
+ * @jest-environment jsdom
+ */
 import React from "react";
 import * as renderer from "react-test-renderer";
-import { fireEvent, render, screen } from "@testing-library/react";
-import * as graphqlService from "../graphql";
+
+import { MockedProvider } from "@apollo/client/testing";
+
+import * as graphqlSchemas from "../graphql/schemas";
 
 import Country from "./country";
 
-const API_URI =
-  process.env.REACT_APP_COUNTRIES_BASE_URL ??
-  "https://countries.trevorblades.com";
-const apolloClient = new graphqlService.ApolloClient(API_URI);
+let container: Element = null;
 
-
-test("Country snapshot", () => {
-  const continent = renderer
-    .create(<Country apolloClient={apolloClient} />)
-    .toJSON();
-  expect(continent).toMatchSnapshot();
+beforeEach(() => {
+  container = document.createElement("div");
+  document.body.appendChild(container);
 });
 
-it("Test input country code", async () => {
-  const elem = render(<Country apolloClient={apolloClient} />, {});
+test("Test country graphql", async () => {
+  const mocks = [
+    {
+      request: {
+        query: graphqlSchemas.GET_COUNTRY,
+        variables: {
+          code: "UA",
+        },
+      },
+      result: {
+        data: {
+          country: {
+            name: "Ukraine",
+            code: "UA",
+            currency: "UAH",
+            emoji: "🇺🇦",
+            languages: [{ name: "Ukrainian", __typename: "Language" }],
+          },
+          
+        },
+      },
+    },
+  ];
 
-  const input = await elem.getByPlaceholderText("Enter Country Code");
-  fireEvent.change(input, { target: { value: "UA" } });
+  let component: any = null;
+  await renderer.act(async () => {
+    component = renderer.create(
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <Country />
+      </MockedProvider>
+    );
+  });
 
-  const country = await screen.findByText(/Ukraine/g);
-  expect(country).not.toBe(null);
+  const root = component.root.findByType("input");
+  await renderer.act(async () => {
+    root.props.onChange({
+      currentTarget: {
+        value: "UA",
+      },
+    });
+  });
+
+  const span = component.root.findAllByType("span");
+  expect(span).not.toEqual([]);
 });

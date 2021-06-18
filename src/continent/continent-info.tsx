@@ -1,4 +1,5 @@
 import * as graphqlServiceTypes from "../graphql/types";
+import * as React from "react";
 
 const ContinentInfo = (data: null | graphqlServiceTypes.IGetContinentResponse) => {
   if (!data) return <div></div>;

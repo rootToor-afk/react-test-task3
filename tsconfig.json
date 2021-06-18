@@ -1,26 +1,23 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
+    "compileOnSave": true,
+    "compilerOptions": {
+        "outDir": "./dist/",
+        "lib": ["ES5","es2015", "dom"],
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "module": "commonjs",
+        "target": "es6",
+        "jsx": "react",
+        "esModuleInterop": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        "src/**/*",
+        "typings/index.d.ts",
+        "jest.config.js"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "allowSyntheticDefaultImports": true,
-    "noFallthroughCasesInSwitch": true,
-    "resolveJsonModule": true
-  },
-  "include": [
-    "src"
-  ]
+    "exclude": [
+        "./src/**/*.test.tsx",
+        "./src/**/*.test.ts"
+    ]
 }

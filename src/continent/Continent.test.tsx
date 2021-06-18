@@ -1,26 +1,95 @@
+/**
+ * @jest-environment jsdom
+ */
 import React from "react";
 import * as renderer from "react-test-renderer";
-import { fireEvent, render, screen } from "@testing-library/react";
-import * as graphqlService from "../graphql";
+import { render } from "react-dom";
+import reactTest, { act } from "react-dom/test-utils";
+import { MockedProvider } from "@apollo/client/testing";
+
+import * as graphqlSchemas from "../graphql/schemas";
 
 import Continent from "./continent";
+import ContinentInput from "./continent-input";
 
-const API_URI =
-  process.env.REACT_APP_COUNTRIES_BASE_URL ??
-  "https://countries.trevorblades.com";
-const apolloClient = new graphqlService.ApolloClient(API_URI);
+let container: Element = null;
 
-test("Continent snapshot", () => {
-  const continent = renderer
-    .create(<Continent apolloClient={apolloClient} />)
-    .toJSON();
-  expect(continent).toMatchSnapshot();
+beforeEach(() => {
+  container = document.createElement("div");
+  document.body.appendChild(container);
 });
 
-it("Test input continent code", async () => {
-  const elem = render(<Continent apolloClient={apolloClient} />, {});
-  const input = await elem.getByPlaceholderText("Enter Continent Code");
-  fireEvent.change(input, { target: { value: "AF" } });
-  const isExist = await screen.findByText(/Angola/g);
-  expect(isExist).not.toBe(null);
+test("Test continent input", () => {
+  let continentCode = "";
+  let continentInput: Element;
+
+  const setContinentCode = (code: string) => {
+    continentCode = code;
+  };
+  act(() => {
+    render(
+      <ContinentInput
+        continentCode={continentCode}
+        onSetContinentCode={setContinentCode}
+      />,
+      container
+    );
+  });
+
+  continentInput = container.querySelector(".continent-code__input");
+  continentInput.setAttribute("value", "AF");
+  act(() => {
+    reactTest.Simulate.change(continentInput);
+  });
+  expect(continentCode).toBe("AF");
+});
+
+test("Test graphql", async () => {
+  const mocks = [
+    {
+      request: {
+        query: graphqlSchemas.GET_CONTINENT,
+        variables: {
+          continent: "AF",
+        },
+      },
+      result: {
+        data: {
+          continent: {
+            countries: [
+              {
+                name: "Angola",
+                emoji: "asd",
+              },
+              {
+                emoji: "🇦🇴",
+                name: "Angola",
+              },
+            ],
+          },
+        },
+      },
+    },
+  ];
+
+  let component: any = null;
+  await renderer.act(async () => {
+    component = renderer.create(
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <Continent />
+      </MockedProvider>
+    );
+  });
+
+  const root = component.root.findByType("input");
+  await renderer.act(async () => {
+    root.props.onChange({
+      currentTarget: {
+        value: "AF",
+      },
+    });
+  });
+
+  const span = component.root.findAllByType("span")
+  expect(span).not.toEqual([])
 });

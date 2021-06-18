@@ -1,4 +1,5 @@
 import * as apolloTypes from "../graphql/types";
+import * as React from "react";
 
 const Country = (data: null | { country: apolloTypes.ICountry }) => {
   if (!data) return <div></div>;

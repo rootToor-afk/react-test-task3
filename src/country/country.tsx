@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import { IAppChildProps } from "../app/types";
-import * as graphqlServiceTypes from "../graphql/types";
-import CountryInfo from "./country-info";
+import * as apolloClient from "@apollo/client";
 
-const Country = (props: IAppChildProps) => {
-  const { apolloClient } = props;
+import CountryInfo from "./country-info";
+import * as apolloSchemas from "../graphql/schemas";
+
+const Country = () => {
   const [countryCode, setCountryCode] = useState("");
   const [isEntered, setIsEntered] = useState(false);
-  const { queryGetter: getCountry, data } = apolloClient.initLazyQuery(
-    graphqlServiceTypes.QueryTypes.GET_COUNTRY
+  const [getCountry, res] = apolloClient.useLazyQuery(
+    apolloSchemas.GET_COUNTRY
   );
+  const data = res.data;
   const isDataExists =
     !!data && !!data.country && !!isEntered ? (
       <CountryInfo country={data.country} />

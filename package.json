@@ -12,7 +12,7 @@
     "build": "webpack",
     "lint": "tslint  --format verbose 'src/**/*.ts?(x)'",
     "test": "jest --updateSnapshot",
-    "start": "webpack-dev-server --port=3003  --hot --inline"
+    "start": "webpack-dev-server --config webpack.config.cjs --port=3003  --hot"
   },
   "dependencies": {
     "@apollo/client": "^3.3.20",
